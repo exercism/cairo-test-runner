@@ -12,26 +12,32 @@
 # ./bin/run-tests.sh
 
 exit_code=0
+# Copy the tests dir to a temp dir, because in the container the user lacks
+# permissions to write to the tests dir.
+tmp_dir='/tmp/exercism-cairo-test-runner'
+rm -rf "${tmp_dir}"
+mkdir -p "${tmp_dir}"
+cp -r tests/* "${tmp_dir}"
 
 # Iterate over all test directories
-for test_dir in tests/*; do
+for test_dir in "${tmp_dir}"/*; do
     test_dir_name=$(basename "${test_dir}")
     test_dir_path=$(realpath "${test_dir}")
+    results_file_path="${test_dir_path}/results.json"
+    expected_results_file_path="${test_dir_path}/expected_results.json"
 
     bin/run.sh "${test_dir_name}" "${test_dir_path}" "${test_dir_path}"
 
-    # OPTIONAL: Normalize the results file
-    # If the results.json file contains information that changes between 
-    # different test runs (e.g. timing information or paths), you should normalize
-    # the results file to allow the diff comparison below to work as expected
+    for file in "$results_file_path" "$expected_results_file_path"; do
+       jq 'if (.tests != null) then .tests |= sort_by(.name) else . end' "${file}" > "${file}.tmp"
+    done
 
-    file="results.json"
-    expected_file="expected_${file}"
-    echo "${test_dir_name}: comparing ${file} to ${expected_file}"
+    echo "${test_dir_name}: comparing results.json to expected_results.json"
 
-    if ! diff "${test_dir_path}/${file}" "${test_dir_path}/${expected_file}"; then
+    if ! diff "${results_file_path}.tmp" "${expected_results_file_path}.tmp"; then
         exit_code=1
     fi
 done
 
+rm -rf "${tmp_dir}"
 exit ${exit_code}
