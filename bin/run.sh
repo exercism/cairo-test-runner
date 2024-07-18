@@ -41,10 +41,10 @@ exit_code=$?
 
 cd "${start_dir}" || exit 1
 
-# Write the results.json file based on the exit code of the command that was 
+# Write the results.json file based on the exit code of the command that was
 # just executed that tested the implementation file
 if [ ${exit_code} -eq 0 ]; then
-    jq -n '{version: 1, status: "pass"}' > "${results_file}"
+    jq -n '{version: 1, status: "pass"}' >"${results_file}"
 else
     # Sanitize the output
     # TODO: enable if needed to escape quotes: test_output_inline=$(printf '%s' "${test_output}" | sed -r 's/\"/\\"/g')
@@ -57,9 +57,15 @@ else
     else
         status="fail"
         sanitized_test_output=$(echo "$test_output_inline" | awk '/failures:/{y=1;next}y' | sed -n -e '/Error: test result/q;p' | sed -r 's/   //g')
-    fi    
+    fi
 
-    jq -n --arg output "${sanitized_test_output}" --arg status "${status}" '{version: 1, status: $status, message: $output}' > "${results_file}"
+    tmp_file=$(mktemp -p .)
+    trap 'rm $tmp_file' EXIT INT TERM
+
+    printf "$sanitized_test_output" >"$tmp_file"
+    sorted_output=$(sort "$tmp_file")
+
+    jq -n --arg output "${sorted_output}" --arg status "${status}" '{version: 1, status: $status, message: $output}' >"${results_file}"
 fi
 
 echo "${slug}: done"
