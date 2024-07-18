@@ -1,5 +1,5 @@
 {
   "version": 1,
   "status": "error",
-  "message": "error: The name `is_leap_year` is defined multiple times.\npub fn is_leap_year(v: u128) -> bool {}\n       ^**********^\n\nerror: Unexpected return type. Expected: \"core::bool\", found: \"()\".\npub fn is_leap_year(v: u128) -> bool {}\n                                     ^^\n\nerror: Unexpected return type. Expected: \"core::bool\", found: \"()\".\npub fn is_leap_year(v: u128) -> bool {}\n                                     ^^"
+  "message": "error: Identifier not found.\nuse leap::is_leap_year;\n          ^**********^"
 }
