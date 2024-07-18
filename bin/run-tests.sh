@@ -37,10 +37,15 @@ for test_dir in "${tmp_dir}"/*; do
 
     echo "${test_dir_name}: comparing results.json to expected_results.json"
 
-    if ! diff "${results_file_path}.tmp" "${expected_results_file_path}.tmp"; then
+    if ! diff "$results_file_path" "$expected_results_file_path"; then
         exit_code=1
     fi
 done
 
 rm -rf "${tmp_dir}"
+
+if [ ${exit_code} -eq 0 ]; then
+    echo "${test_dir_name}: done"
+fi
+
 exit ${exit_code}
