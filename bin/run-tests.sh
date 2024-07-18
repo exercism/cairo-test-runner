@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Synopsis:
-# Test the test runner by running it against a predefined set of solutions 
+# Test the test runner by running it against a predefined set of solutions
 # with an expected output.
 
 # Output:
@@ -27,10 +27,6 @@ for test_dir in "${tmp_dir}"/*; do
     expected_results_file_path="${test_dir_path}/expected_results.json"
 
     bin/run.sh "${test_dir_name}" "${test_dir_path}" "${test_dir_path}"
-
-    for file in "$results_file_path" "$expected_results_file_path"; do
-       jq 'if (.tests != null) then .tests |= sort_by(.name) else . end' "${file}" > "${file}.tmp"
-    done
 
     echo "${test_dir_name}: comparing results.json to expected_results.json"
 
