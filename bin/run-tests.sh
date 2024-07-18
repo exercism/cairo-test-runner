@@ -30,7 +30,7 @@ for test_dir in "${tmp_dir}"/*; do
 
     for file in "$results_file_path" "$expected_results_file_path"; do
         # We sort both the '.message' values in results.json and expected_results.json files
-        tmp_file=$(mktemp -p .)
+        tmp_file=$(mktemp -p "$test_dir/")
         sorted_message=$(cat $file | jq -r '.message' >"$tmp_file" && sort "$tmp_file")
         jq --arg msg "$sorted_message" '.message = $msg' "$file" >"$tmp_file" && mv "$tmp_file" "$file"
     done

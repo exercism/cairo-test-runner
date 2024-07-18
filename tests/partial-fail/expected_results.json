@@ -1,5 +1,5 @@
 {
   "version": 1,
   "status": "fail",
-  "message": "leap_leap::leap::year_divisible_by_100_but_not_by_3_is_still_not_a_leap_year - Panicked with \"assertion failed: `!is_leap_year(1900)`.\".\nleap_leap::leap::year_divisible_by_200_not_divisible_by_400_in_common_year - Panicked with \"assertion failed: `!is_leap_year(1800)`.\".\nleap_leap::leap::year_divisible_by_100_not_divisible_by_400_in_common_year - Panicked with \"assertion failed: `!is_leap_year(2100)`.\"."
+  "message": "leap_leap::leap::year_divisible_by_100_but_not_by_3_is_still_not_a_leap_year - Panicked with \"assertion failed: `!is_leap_year(1900)`.\".\nleap_leap::leap::year_divisible_by_100_not_divisible_by_400_in_common_year - Panicked with \"assertion failed: `!is_leap_year(2100)`.\".\nleap_leap::leap::year_divisible_by_200_not_divisible_by_400_in_common_year - Panicked with \"assertion failed: `!is_leap_year(1800)`.\"."
 }
