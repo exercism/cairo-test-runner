@@ -34,9 +34,9 @@ echo "${slug}: testing..."
 start_dir="$(pwd)"
 cd "${solution_dir}" || exit 1
 
-# Run the tests for the provided implementation file and redirect stdout and
-# stderr to capture it
-test_output=$(scarb cairo-test --include-ignored 2>&1)
+# Run the tests for the provided implementation file and redirect stdout and stderr to capture it.
+# We also redirect the global cache from some default global directory to the output directory.
+test_output=$(scarb --global-cache-dir "$output_dir/.cache" cairo-test --include-ignored 2>&1)
 exit_code=$?
 
 cd "${start_dir}" || exit 1
