@@ -45,7 +45,7 @@ done
 rm -rf "${tmp_dir}"
 
 if [ ${exit_code} -eq 0 ]; then
-    echo "${test_dir_name}: done"
+    echo "run-tests: done"
 fi
 
 exit ${exit_code}

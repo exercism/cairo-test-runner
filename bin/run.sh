@@ -61,4 +61,4 @@ else
     jq -n --arg output "${sanitized_test_output}" --arg status "${status}" '{version: 1, status: $status, message: $output}' >"${results_file}"
 fi
 
-echo "${slug}: done"
+echo "${slug}: generated $results_file"
