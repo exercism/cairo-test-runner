@@ -35,7 +35,7 @@ for test_dir in "${tmp_dir}"/*; do
         jq --arg msg "$sorted_message" '.message = $msg' "$file" >"$tmp_file" && mv "$tmp_file" "$file"
     done
 
-    echo "${test_dir_name}: comparing results.json to expected_results.json"
+    echo "$test_dir_name: comparing $(basename "${results_file_path}") to $(basename "${expected_results_file_path}")"
 
     if ! diff "$results_file_path" "$expected_results_file_path"; then
         exit_code=1
