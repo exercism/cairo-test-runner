@@ -1,11 +1,11 @@
-ARG REPO=ubuntu
-ARG IMAGE=22.04
+ARG REPO=alpine
+ARG IMAGE=3.18
 FROM ${REPO}:${IMAGE} AS builder
 
 ARG VERSION=v2.6.5
-ARG RELEASE=scarb-${VERSION}-x86_64-unknown-linux-gnu
+ARG RELEASE=scarb-${VERSION}-x86_64-unknown-linux-musl
 
-RUN apt-get update && apt-get install -y curl
+RUN apk add --no-cache curl
 
 RUN mkdir opt/test-runner
 RUN mkdir opt/test-runner/bin
@@ -19,7 +19,7 @@ FROM ${REPO}:${IMAGE} AS runner
 
 # install packages required to run the tests
 # hadolint ignore=DL3018
-RUN apt-get update && apt-get install -y jq
+RUN apk add --no-cache jq
 
 COPY --from=builder /opt/test-runner/bin/scarb /opt/test-runner/bin/scarb
 ENV PATH=$PATH:/opt/test-runner/bin/scarb/bin
