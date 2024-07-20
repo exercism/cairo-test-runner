@@ -39,6 +39,8 @@ for test_dir in "${tmp_dir}"/*; do
 
     if ! diff "$results_file_path" "$expected_results_file_path"; then
         exit_code=1
+    else
+        echo "$test_dir_name: results match"
     fi
 done
 
