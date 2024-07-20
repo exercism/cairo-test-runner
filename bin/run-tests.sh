@@ -45,9 +45,4 @@ for test_dir in "${tmp_dir}"/*; do
 done
 
 rm -rf "${tmp_dir}"
-
-if [ ${exit_code} -eq 0 ]; then
-    echo "run-tests: done"
-fi
-
 exit ${exit_code}
