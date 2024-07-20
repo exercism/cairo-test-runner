@@ -52,7 +52,7 @@ else
     # Try to distinguish between failing tests and errors
     if echo "$test_output_inline" | grep -q "error:"; then
         status="error"
-        sanitized_test_output=$(echo "$test_output_inline" | sed '/Compiling.*$/d' | sed "s@$solution_dir@@g" | sed -n -e '/error: could not compile/q;p')
+        sanitized_test_output=$(echo "$test_output_inline" | sed '/Compiling.*$/d' | sed -n -e '/error: could not compile/q;p' | sed "s@$solution_dir@@g")
     else
         status="fail"
         sanitized_test_output=$(echo "$test_output_inline" | awk '/failures:/{y=1;next}y' | sed -n -e '/Error: test result/q;p' | sed -r 's/   //g')
