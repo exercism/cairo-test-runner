@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Synopsis:
-# Test the test runner by running it against a predefined set of solutions 
+# Test the test runner by running it against a predefined set of solutions
 # with an expected output.
 
 # Output:
@@ -12,26 +12,37 @@
 # ./bin/run-tests.sh
 
 exit_code=0
+# Copy the tests dir to a temp dir, because in the container the user lacks
+# permissions to write to the tests dir.
+tmp_dir='/tmp/exercism-cairo-test-runner'
+rm -rf "${tmp_dir}"
+mkdir -p "${tmp_dir}"
+cp -r tests/* "${tmp_dir}"
 
 # Iterate over all test directories
-for test_dir in tests/*; do
+for test_dir in "${tmp_dir}"/*; do
     test_dir_name=$(basename "${test_dir}")
     test_dir_path=$(realpath "${test_dir}")
+    results_file_path="${test_dir_path}/results.json"
+    expected_results_file_path="${test_dir_path}/expected_results.json"
 
     bin/run.sh "${test_dir_name}" "${test_dir_path}" "${test_dir_path}"
 
-    # OPTIONAL: Normalize the results file
-    # If the results.json file contains information that changes between 
-    # different test runs (e.g. timing information or paths), you should normalize
-    # the results file to allow the diff comparison below to work as expected
+    for file in "$results_file_path" "$expected_results_file_path"; do
+        # We sort both the '.message' values in results.json and expected_results.json files
+        tmp_file=$(mktemp -p "$test_dir/")
+        sorted_message=$(cat $file | jq -r '.message' >"$tmp_file" && sort "$tmp_file")
+        jq --arg msg "$sorted_message" '.message = $msg' "$file" >"$tmp_file" && mv "$tmp_file" "$file"
+    done
 
-    file="results.json"
-    expected_file="expected_${file}"
-    echo "${test_dir_name}: comparing ${file} to ${expected_file}"
+    echo "$test_dir_name: comparing $(basename "${results_file_path}") to $(basename "${expected_results_file_path}")"
 
-    if ! diff "${test_dir_path}/${file}" "${test_dir_path}/${expected_file}"; then
+    if ! diff "$results_file_path" "$expected_results_file_path"; then
         exit_code=1
+    else
+        echo "$test_dir_name: results match"
     fi
 done
 
+rm -rf "${tmp_dir}"
 exit ${exit_code}

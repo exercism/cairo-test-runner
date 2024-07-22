@@ -1,1 +1,3 @@
 /tests/**/*/results.json
+/tests/**/Scarb.lock
+/tests/**/target
