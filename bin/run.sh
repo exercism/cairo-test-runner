@@ -46,16 +46,13 @@ cd "${start_dir}" || exit 1
 if [ ${exit_code} -eq 0 ]; then
     jq -n '{version: 1, status: "pass"}' >"${results_file}"
 else
-    # Sanitize the output
-    test_output_inline=$(printf '%s' "$test_output")
-
     # Try to distinguish between failing tests and errors
-    if echo "$test_output_inline" | grep -q "error:"; then
+    if echo "$test_output" | grep -q "error:"; then
         status="error"
-        sanitized_test_output=$(echo "$test_output_inline" | sed '/Compiling.*$/d' | sed -n -e '/error: could not compile/q;p' | sed "s@$solution_dir@@g")
+        sanitized_test_output=$(echo "$test_output" | sed -n "/Compiling.*$/d ; s@$solution_dir@@g ; /error: could not compile/q;p")
     else
         status="fail"
-        sanitized_test_output=$(echo "$test_output_inline" | awk '/failures:/{y=1;next}y' | sed -n -e '/Error: test result/q;p' | sed -r 's/   //g')
+        sanitized_test_output=$(echo "$test_output" | sed -n '1,/failures:/d ; /Error: test result/q;p' | sed 's/[[:space:]]\{3\}.\+:://g ; /./G')
     fi
 
     jq -n --arg output "${sanitized_test_output}" --arg status "${status}" '{version: 1, status: $status, message: $output}' >"${results_file}"
