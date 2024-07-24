@@ -52,7 +52,7 @@ else
         sanitized_test_output=$(echo "$test_output" | sed -n "/Compiling.*$/d ; s@$solution_dir@@g ; /error: could not compile/q;p")
     else
         status="fail"
-        sanitized_test_output=$(echo "$test_output" | sed -n '1,/failures:/d ; /Error: test result/q;p' | sed 's/   //g ; /./G')
+        sanitized_test_output=$(echo "$test_output" | sed -n '1,/failures:/d ; /Error: test result/q;p' | sed 's/[[:space:]]\{3\}.\+:://g ; /./G')
     fi
 
     jq -n --arg output "${sanitized_test_output}" --arg status "${status}" '{version: 1, status: $status, message: $output}' >"${results_file}"
