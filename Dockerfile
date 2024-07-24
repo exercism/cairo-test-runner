@@ -1,4 +1,6 @@
-FROM alpine:3.18 AS builder
+ARG REPO=alpine
+ARG IMAGE=3.18
+FROM ${REPO}:${IMAGE} AS builder
 
 # set up Scarb
 ARG VERSION=v2.6.5
@@ -12,10 +14,13 @@ RUN tar -xf ${RELEASE}.tar.gz --strip-components=1 \
     && rm -rf ./bin/scarb-cairo-run \
     && rm -rf ./bin/scarb-snforge-test-collector
 
-ENV PATH=$PATH:/opt/test-runner/bin/scarb/bin
+FROM ${REPO}:${IMAGE} AS runner
 
 # install jq package to format test results
 RUN apk add --no-cache jq
+
+COPY --from=builder /opt/test-runner/bin/scarb /opt/test-runner/bin/scarb
+ENV PATH=$PATH:/opt/test-runner/bin/scarb/bin
 
 WORKDIR /opt/test-runner
 
