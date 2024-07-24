@@ -10,9 +10,9 @@ WORKDIR /opt/test-runner/bin/scarb
 ADD https://github.com/software-mansion/scarb/releases/download/${VERSION}/${RELEASE}.tar.gz .
 RUN tar -xf ${RELEASE}.tar.gz --strip-components=1 \
     && rm -rf ./doc \
-    && rm -rf ./bin/scarb-cairo-language-server \
-    && rm -rf ./bin/scarb-cairo-run \
-    && rm -rf ./bin/scarb-snforge-test-collector
+    ./bin/scarb-cairo-language-server \
+    ./bin/scarb-cairo-run \
+    ./bin/scarb-snforge-test-collector
 
 FROM ${REPO}:${IMAGE} AS runner
 
@@ -24,13 +24,13 @@ ENV PATH=$PATH:/opt/test-runner/bin/scarb/bin
 
 WORKDIR /opt/test-runner
 
-COPY . .
+COPY bin/run.sh bin/run.sh
 
 # Initialize a Cairo cache
 RUN mkdir -p init-cairo-cache/src
-RUN echo '// dummy file' > init-cairo-cache/src/lib.cairo
 COPY Scarb.toml init-cairo-cache/
-RUN scarb --manifest-path init-cairo-cache/Scarb.toml --release build \
+RUN echo '// dummy file' > init-cairo-cache/src/lib.cairo \
+    && scarb --manifest-path init-cairo-cache/Scarb.toml --release build \
     && rm -rf init-cairo-cache/
 
 ENTRYPOINT ["/opt/test-runner/bin/run.sh"]
