@@ -18,6 +18,7 @@ tmp_dir='/tmp/exercism-cairo-test-runner'
 rm -rf "${tmp_dir}"
 mkdir -p "${tmp_dir}"
 cp -r tests/* "${tmp_dir}"
+cp .tool-versions "${tmp_dir}"
 
 # Iterate over all test directories
 for test_dir in "${tmp_dir}"/*; do
