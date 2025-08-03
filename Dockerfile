@@ -26,11 +26,4 @@ WORKDIR /opt/test-runner
 
 COPY bin/run.sh bin/run.sh
 
-# Initialize a Cairo cache
-RUN mkdir -p init-cairo-cache/src
-COPY Scarb.toml init-cairo-cache/
-RUN echo '// dummy file' > init-cairo-cache/src/lib.cairo \
-    && scarb --manifest-path init-cairo-cache/Scarb.toml --release build \
-    && rm -rf init-cairo-cache/
-
 ENTRYPOINT ["/opt/test-runner/bin/run.sh"]
