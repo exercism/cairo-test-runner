@@ -19,6 +19,9 @@ rm -rf "${tmp_dir}"
 mkdir -p "${tmp_dir}"
 cp -r tests/* "${tmp_dir}"
 
+# align scarb version when running the script locally
+[ -f .tool-versions ] && cp .tool-versions "${tmp_dir}"
+
 # Iterate over all test directories
 for test_dir in "${tmp_dir}"/*; do
     test_dir_name=$(basename "${test_dir}")

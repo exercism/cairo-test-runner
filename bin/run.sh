@@ -36,7 +36,7 @@ cd "${solution_dir}" || exit 1
 
 # Run the tests for the provided implementation file and redirect stdout and stderr to capture it.
 # We also redirect the global cache from some default global directory to the output directory.
-test_output=$(scarb --global-cache-dir "$output_dir/.cache" cairo-test --include-ignored 2>&1)
+test_output=$(scarb --global-cache-dir "$output_dir/.cache" cairo-test --test-kind integration --include-ignored 2>&1)
 exit_code=$?
 
 cd "${start_dir}" || exit 1
