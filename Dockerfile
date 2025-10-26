@@ -3,7 +3,7 @@ ARG IMAGE=3.20.0@sha256:77726ef6b57ddf65bb551896826ec38bc3e53f75cdde31354fbffb4f
 FROM ${REPO}:${IMAGE} AS builder
 
 # set up Scarb
-ARG VERSION=v2.9.2
+ARG VERSION=v2.12.2
 ARG RELEASE=scarb-${VERSION}-x86_64-unknown-linux-musl
 
 WORKDIR /opt/test-runner/bin/scarb
