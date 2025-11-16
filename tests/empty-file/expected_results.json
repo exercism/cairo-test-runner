@@ -1,5 +1,5 @@
 {
   "version": 1,
   "status": "error",
-  "message": "          ^^^^^^^^^^^^\nerror[E0006]: Identifier not found.\n --> /tests/leap.cairo:1:11\nuse leap::is_leap_year;"
+  "message": "error[E0006]: Identifier not found.\n --> /tests/leap.cairo:1:11\nuse leap::is_leap_year;\n          ^^^^^^^^^^^^"
 }
