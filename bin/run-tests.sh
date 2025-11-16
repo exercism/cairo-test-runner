@@ -26,13 +26,12 @@ for test_dir in tests/*; do
     rm -rf "${test_dir_path}/target"
     rm -f "${test_dir_path}/Scarb.lock"
 
-    # Check if the "message" field exists and is not null
-    has_message=$(jq 'has("message") and .message != null' "$results_file_path")
-
-    if [ "$has_message" = "true" ]; then
-        sorted_message=$(jq -r '.message' "$results_file_path" | sort | jq -s -R '.')
-        jq ".message = $sorted_message" "$results_file_path" >"$results_file_path.tmp" && mv "$results_file_path.tmp" "$results_file_path"
-    fi
+    for file in "$results_file_path" "$expected_results_file_path"; do
+        # We sort both the '.message' values in results.json and expected_results.json files
+        tmp_file=$(mktemp -p "$test_dir/")
+        sorted_message=$(cat $file | jq -r '.message' >"$tmp_file" && sort "$tmp_file")
+        jq --arg msg "$sorted_message" '.message = $msg' "$file" >"$tmp_file" && mv "$tmp_file" "$file"
+    done
 
     echo "$test_dir_name: comparing $(basename "${results_file_path}") to $(basename "${expected_results_file_path}")"
 
