@@ -12,9 +12,18 @@
 # ./bin/run-tests.sh
 
 exit_code=0
+# Copy the tests dir to a temp dir, because in the container the user lacks
+# permissions to write to the tests dir.
+tmp_dir='/tmp/exercism-cairo-test-runner'
+rm -rf "${tmp_dir}"
+mkdir -p "${tmp_dir}"
+cp -r tests/* "${tmp_dir}"
+
+# align scarb version when running the script locally
+[ -f .tool-versions ] && cp .tool-versions "${tmp_dir}"
 
 # Iterate over all test directories
-for test_dir in tests/*; do
+for test_dir in "${tmp_dir}"/*; do
     test_dir_name=$(basename "${test_dir}")
     test_dir_path=$(realpath "${test_dir}")
     results_file_path="${test_dir_path}/results.json"
@@ -22,23 +31,21 @@ for test_dir in tests/*; do
 
     bin/run.sh "${test_dir_name}" "${test_dir_path}" "${test_dir_path}"
 
-    rm -rf "${test_dir_path}/.cache"
-    rm -rf "${test_dir_path}/target"
-    rm -f "${test_dir_path}/Scarb.lock"
-
-    # Check if the "message" field exists and is not null
-    has_message=$(jq 'has("message") and .message != null' "$results_file_path")
-
-    if [ "$has_message" = "true" ]; then
-        sorted_message=$(jq -r '.message' "$results_file_path" | sort | jq -s -R '.')
-        jq ".message = $sorted_message" "$results_file_path" >"$results_file_path.tmp" && mv "$results_file_path.tmp" "$results_file_path"
-    fi
+    for file in "$results_file_path" "$expected_results_file_path"; do
+        # We sort both the '.message' values in results.json and expected_results.json files
+        tmp_file=$(mktemp -p "$test_dir/")
+        sorted_message=$(cat $file | jq -r '.message' >"$tmp_file" && sort "$tmp_file")
+        jq --arg msg "$sorted_message" '.message = $msg' "$file" >"$tmp_file" && mv "$tmp_file" "$file"
+    done
 
     echo "$test_dir_name: comparing $(basename "${results_file_path}") to $(basename "${expected_results_file_path}")"
 
     if ! diff "$results_file_path" "$expected_results_file_path"; then
         exit_code=1
+    else
+        echo "$test_dir_name: results match"
     fi
 done
 
+rm -rf "${tmp_dir}"
 exit ${exit_code}
