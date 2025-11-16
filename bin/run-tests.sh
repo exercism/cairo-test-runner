@@ -37,7 +37,8 @@ for test_dir in "${tmp_dir}"/*; do
 
     if [ "$has_message" = "true" ]; then
         sorted_message=$(jq -r '.message' "$results_file_path" | sed 's/^ *//' | "$SORTBIN" | jq -s -R '.')
-        jq ".message = $sorted_message" "$results_file_path" >"$results_file_path.tmp" && mv "$results_file_path.tmp" "$results_file_path"
+        jq --arg message "$sorted_message" '.message = $message' "$results_file_path" >"$results_file_path.tmp"
+        mv "$results_file_path.tmp" "$results_file_path"
     fi
 
     echo "$test_dir_name: comparing $(basename "${results_file_path}") to $(basename "${expected_results_file_path}")"
