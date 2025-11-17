@@ -22,6 +22,8 @@ cp -r tests/* "${tmp_dir}"
 # align scarb version when running the script locally
 [ -f .tool-versions ] && cp .tool-versions "${tmp_dir}"
 
+SORTBIN=$(command -v gsort || command -v sort)
+
 # Iterate over all test directories
 for test_dir in "${tmp_dir}"/*; do
     test_dir_name=$(basename "${test_dir}")
@@ -31,12 +33,13 @@ for test_dir in "${tmp_dir}"/*; do
 
     bin/run.sh "${test_dir_name}" "${test_dir_path}" "${test_dir_path}"
 
-    for file in "$results_file_path" "$expected_results_file_path"; do
-        # We sort both the '.message' values in results.json and expected_results.json files
-        tmp_file=$(mktemp -p "$test_dir/")
-        sorted_message=$(cat $file | jq -r '.message' >"$tmp_file" && sort "$tmp_file")
-        jq --arg msg "$sorted_message" '.message = $msg' "$file" >"$tmp_file" && mv "$tmp_file" "$file"
-    done
+    has_message=$(jq 'has("message") and .message != null' "$results_file_path")
+
+    if [ "$has_message" = "true" ]; then
+        sorted_message=$(jq -r '.message' "$results_file_path" | sed 's/^ *//' | "$SORTBIN")
+        jq --arg message "$sorted_message" '.message = $message' "$results_file_path" >"$results_file_path.tmp"
+        mv "$results_file_path.tmp" "$results_file_path"
+    fi
 
     echo "$test_dir_name: comparing $(basename "${results_file_path}") to $(basename "${expected_results_file_path}")"
 
