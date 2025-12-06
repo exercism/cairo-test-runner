@@ -12,15 +12,6 @@
 # ./bin/run-tests.sh
 
 exit_code=0
-# Copy the tests dir to a temp dir as per docs recommendation, see:
-# https://exercism.org/docs/building/tooling/test-runners/interface
-tmp_dir='/tmp/exercism-cairo-test-runner'
-rm -rf "${tmp_dir}"
-mkdir -p "${tmp_dir}"
-cp -r tests/* "${tmp_dir}"
-
-# align scarb version when running the script locally
-[ -f .tool-versions ] && cp .tool-versions "${tmp_dir}"
 
 # Copy the tests dir to a temp dir, as per docs recommendation, see:
 # https://exercism.org/docs/building/tooling/test-runners/interface
@@ -52,10 +43,7 @@ for test_dir in "${tmp_dir}"/*; do
 
     if ! diff "$results_file_path" "$expected_results_file_path"; then
         exit_code=1
-    else
-        echo "$test_dir_name: results match"
     fi
 done
 
-rm -rf "${tmp_dir}"
 exit ${exit_code}
