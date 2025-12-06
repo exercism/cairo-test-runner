@@ -13,7 +13,7 @@
 
 exit_code=0
 
-# Copy the tests dir to a temp dir, as per docs recommendation, see:
+# Copy the tests dir to a temp dir as per docs recommendation, see:
 # https://exercism.org/docs/building/tooling/test-runners/interface
 tmp_dir='/tmp/exercism-cairo-test-runner'
 mkdir -p "${tmp_dir}"
