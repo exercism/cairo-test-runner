@@ -17,7 +17,7 @@ RUN tar -xf ${RELEASE}.tar.gz --strip-components=1 \
 FROM ${REPO}:${IMAGE} AS runner
 
 # install jq package to format test results
-RUN apk add --no-cache jq coreutils
+RUN apk add --no-cache jq
 
 COPY --from=builder /opt/test-runner/bin/scarb /opt/test-runner/bin/scarb
 ENV PATH=$PATH:/opt/test-runner/bin/scarb/bin

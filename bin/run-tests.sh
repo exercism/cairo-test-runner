@@ -11,8 +11,6 @@
 # Example:
 # ./bin/run-tests.sh
 
-SORTBIN=$(command -v gsort || command -v sort)
-
 # Iterate over all test directories
 for test_dir in tests/*; do
     test_dir_name=$(basename "${test_dir}")
@@ -29,8 +27,7 @@ for test_dir in tests/*; do
     has_message=$(jq 'has("message") and .message != null' "$results_file_path")
 
     if [ "$has_message" = "true" ]; then
-        sorted_message=$(jq -r '.message' "$results_file_path" | sed 's/^ *//' | "$SORTBIN")
-        jq --arg message "$sorted_message" '.message = $message' "$results_file_path" > "$results_file_path.tmp"
+        jq '.message = (.message|split("\n")|map(sub("^[ \t]+"; "")|select(. != ""))|sort|join("\n"))' "$results_file_path" > "$results_file_path.tmp"
         mv "$results_file_path.tmp" "$results_file_path"
     fi
 
