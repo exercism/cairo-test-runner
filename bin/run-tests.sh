@@ -11,21 +11,10 @@
 # Example:
 # ./bin/run-tests.sh
 
-exit_code=0
-# Copy the tests dir to a temp dir, because in the container the user lacks
-# permissions to write to the tests dir.
-tmp_dir='/tmp/exercism-cairo-test-runner'
-rm -rf "${tmp_dir}"
-mkdir -p "${tmp_dir}"
-cp -r tests/* "${tmp_dir}"
-
-# align scarb version when running the script locally
-[ -f .tool-versions ] && cp .tool-versions "${tmp_dir}"
-
 SORTBIN=$(command -v gsort || command -v sort)
 
 # Iterate over all test directories
-for test_dir in "${tmp_dir}"/*; do
+for test_dir in tests/*; do
     test_dir_name=$(basename "${test_dir}")
     test_dir_path=$(realpath "${test_dir}")
     results_file_path="${test_dir_path}/results.json"
@@ -33,22 +22,20 @@ for test_dir in "${tmp_dir}"/*; do
 
     bin/run.sh "${test_dir_name}" "${test_dir_path}" "${test_dir_path}"
 
+    rm -rf "${test_dir_path}/.cache"
+    rm -rf "${test_dir_path}/target"
+    rm -f "${test_dir_path}/Scarb.lock"
+
     has_message=$(jq 'has("message") and .message != null' "$results_file_path")
 
     if [ "$has_message" = "true" ]; then
         sorted_message=$(jq -r '.message' "$results_file_path" | sed 's/^ *//' | "$SORTBIN")
-        jq --arg message "$sorted_message" '.message = $message' "$results_file_path" >"$results_file_path.tmp"
-        mv "$results_file_path.tmp" "$results_file_path"
+        jq --arg message "$sorted_message" '.message = $message' "$results_file_path" > "$results_file_path.tmp"
     fi
 
     echo "$test_dir_name: comparing $(basename "${results_file_path}") to $(basename "${expected_results_file_path}")"
 
     if ! diff "$results_file_path" "$expected_results_file_path"; then
-        exit_code=1
-    else
-        echo "$test_dir_name: results match"
+        exit 1
     fi
 done
-
-rm -rf "${tmp_dir}"
-exit ${exit_code}
