@@ -11,6 +11,8 @@
 # Example:
 # ./bin/run-tests.sh
 
+exit_code=0
+
 # Iterate over all test directories
 for test_dir in tests/*; do
     test_dir_name=$(basename "${test_dir}")
@@ -34,6 +36,8 @@ for test_dir in tests/*; do
     echo "$test_dir_name: comparing $(basename "${results_file_path}") to $(basename "${expected_results_file_path}")"
 
     if ! diff "$results_file_path" "$expected_results_file_path"; then
-        exit 1
+        exit_code=1
     fi
 done
+
+exit ${exit_code}
