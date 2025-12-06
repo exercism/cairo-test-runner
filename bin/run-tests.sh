@@ -12,8 +12,8 @@
 # ./bin/run-tests.sh
 
 exit_code=0
-# Copy the tests dir to a temp dir, because in the container the user lacks
-# permissions to write to the tests dir.
+# Copy the tests dir to a temp dir as per docs recommendation, see:
+# https://exercism.org/docs/building/tooling/test-runners/interface
 tmp_dir='/tmp/exercism-cairo-test-runner'
 rm -rf "${tmp_dir}"
 mkdir -p "${tmp_dir}"
