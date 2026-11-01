@@ -1,5 +1,5 @@
 # target = alpine-latest
-FROM alpine:3.24.2@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6 AS builder
+FROM alpine:3.24.3@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a AS builder
 
 # set up Scarb
 ARG VERSION=v2.14.0
@@ -13,7 +13,7 @@ RUN tar -xf ${RELEASE}.tar.gz --strip-components=1 \
     ./bin/scarb-cairo-run \
     ./bin/scarb-snforge-test-collector
 
-FROM alpine:3.24.2@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6 AS runner
+FROM alpine:3.24.3@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a AS runner
 
 # install jq package to format test results
 RUN apk add --no-cache jq
